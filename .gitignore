@@ -1,0 +1,40 @@
+# ========== NODE MODULES ==========
+node_modules/
+
+# ========== ENV FILES ==========
+.env
+.env.local
+.env.production
+
+# ========== LOGS ==========
+*.log
+
+# ========== BUILD OUTPUT ==========
+dist/
+build/
+.next/
+
+# ========== FRONTEND ==========
+frontend/dist/
+frontend/build/
+
+# ========== BACKEND ==========
+backend/dist/
+backend/build/
+
+# ========== UPLOADS / RAG FILES ==========
+uploads/
+files/
+backend/uploads/
+
+# ========== DATABASE / VECTOR STORE ==========
+data/
+.pgdata/
+chromadb/
+faiss_index/
+
+# ========== OS / IDE ==========
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
