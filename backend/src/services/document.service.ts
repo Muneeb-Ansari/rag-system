@@ -2,7 +2,6 @@ import { count, eq } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { documentChunks, documents } from "../db/schema.js";
 import { loadPDF } from "../loaders/pdfLoader.js";
-import { chunkText } from "../utils/chunk.js";
 import { vectorService } from "./vector.service.js";
 
 export const documentService = {
@@ -13,7 +12,7 @@ export const documentService = {
 
   async ingestPdf(filePath: string, fileName: string) {
     const text = await loadPDF(filePath);
-    const chunks = chunkText(text);
+    const chunks = await this.chunkText(text);
 
     if (chunks.length === 0) {
       throw new Error("No text could be extracted from the PDF");
@@ -45,8 +44,21 @@ export const documentService = {
     };
   },
 
-  async deleteDocument(documentId: string) {
-    await db.delete(documentChunks).where(eq(documentChunks.documentId, documentId));
-    await db.delete(documents).where(eq(documents.id, documentId));
-  },
+  // async deleteDocument(documentId: string) {
+  //   await db.delete(documentChunks).where(eq(documentChunks.documentId, documentId));
+  //   await db.delete(documents).where(eq(documents.id, documentId));
+  // },
+
+  async chunkText(text: string, size = 1000, overlap = 200) {
+
+    const chunks = [];
+    let i = 0;
+
+    while (i < text.length) {
+      chunks.push(text.slice(i, i + size));
+      i += size - overlap;
+    }
+
+    return chunks;
+  }
 };

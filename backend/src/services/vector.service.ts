@@ -14,13 +14,17 @@ export const vectorService = {
     const queryEmbedding = await this.createEmbedding(query);
     const distanceExpr = cosineDistance(documentChunks.embedding, queryEmbedding);
 
-    return db
+    const results = await db
       .select({
         content: documentChunks.content,
-        distance: distanceExpr,
+        distanceExpr: distanceExpr,
       })
       .from(documentChunks)
       .orderBy(distanceExpr)
       .limit(limit);
+
+
+    return results;
   },
+
 };

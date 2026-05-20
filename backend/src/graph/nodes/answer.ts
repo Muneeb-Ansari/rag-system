@@ -4,19 +4,26 @@ import type { GraphState } from "../state.js";
 export async function answerNode(
   state: GraphState,
 ): Promise<Pick<GraphState, "answer">> {
-  const contextBlock = state.context
-    ? state.context
-    : "No document context was retrieved.";
+
+  if (!state.context || state.context === "No relevant context found in uploaded documents.") {
+    return {
+      answer: "I could not find the answer to this question in the uploaded documents. Please upload a relevant document.",
+    };
+  }
 
   const response = await llm.invoke([
     {
       role: "system",
-      content:
-        "Answer the user question clearly and concisely. Use the provided context when it is relevant. If context is missing or not relevant, answer from general knowledge and say when document context was not used.",
+      content: `You are a document assistant.
+Answer only and strictly from the provided context.
+If the answer is not available in the context, say:
+"I could not find the answer to this question in the uploaded documents."
+Do not add anything from your own knowledge.
+Do not use external knowledge.`
     },
     {
       role: "user",
-      content: `Question:\n${state.question}\n\nContext:\n${contextBlock}`,
+      content: `Context:\n${state.context}\n\nQuestion:\n${state.question}`,
     },
   ]);
 

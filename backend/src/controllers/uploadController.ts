@@ -9,6 +9,8 @@ export async function upload(
 ): Promise<void> {
   const file = req.file;
 
+  console.log("reaching", { file });
+
   try {
     if (!file) {
       res.status(400).json({ error: "A PDF file is required (field name: file)" });

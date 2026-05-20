@@ -1,4 +1,5 @@
 import {
+  jsonb,
     pgTable,
     text,
     uuid,
@@ -19,5 +20,6 @@ export const documentChunks = pgTable("document_chunks", {
 
   content: text("content").notNull(),
 
-  embedding: vector("embedding", { dimensions: 1536 }).notNull(),
+  // embedding: text("embedding").notNull(),
+  embedding: vector("embedding", { dimensions: 1536 }).notNull()
 });
