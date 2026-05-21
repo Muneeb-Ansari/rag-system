@@ -17,9 +17,8 @@ const model = new ChatOpenAI({
 });
 
 const routerNode = async (state: any) => {
-  const question = state.question;
-
-   const response = await model.invoke([
+  
+  const response = await model.invoke([
     {
       role: "system",
       content: `
