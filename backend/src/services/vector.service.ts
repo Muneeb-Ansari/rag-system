@@ -1,6 +1,6 @@
-import { cosineDistance } from "drizzle-orm";
+import { cosineDistance, desc } from "drizzle-orm";
 import { db } from "../db/index.js";
-import { documentChunks } from "../db/schema.js";
+import { documentChunks, products } from "../db/schema.js";
 import { embeddings } from "./embedding.js";
 
 const SIMILARITY_LIMIT = 4;
@@ -27,4 +27,22 @@ export const vectorService = {
     return results;
   },
 
+  async searchProducts(query: string, limit = SIMILARITY_LIMIT) {
+    const queryEmbedding = await this.createEmbedding(query);
+    const distanceExpr = cosineDistance(products.embedding, queryEmbedding);
+    const results = await db
+      .select({
+        name: products.name,
+        description: products.description,
+        image: products.image,
+        price: products.price,
+        distanceExpr: distanceExpr,
+
+      })
+      .from(products)
+      .orderBy(distanceExpr)
+      .limit(limit);
+
+    return results;
+  },
 };

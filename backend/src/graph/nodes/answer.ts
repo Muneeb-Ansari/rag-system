@@ -5,17 +5,11 @@ export async function answerNode(
   state: GraphState,
 ): Promise<Pick<GraphState, "answer">> {
 
-  console.log("Generating answer for question:", state.question);
-
-  const isProductContext =
-    state.context?.includes("name:") && state.context?.includes("price:");
+  // const isProductContext =
+  //   state.context?.includes("name:") && state.context?.includes("price:");
 
   if (!state.context || state.context === "No relevant context found in uploaded documents.") {
-   return {
-      answer: isProductContext
-        ? "I am unable to find the exact answer in the product database, but I can help guide you based on general product knowledge. Please let me know what you are looking for or any specific questions you have about products, and I'll do my best to assist you!"
-        : "I could not find the answer in the uploaded documents.",
-    };
+   return {answer: "I could not find the answer in the uploaded documents."};
   }
 
   const response = await llm.invoke([

@@ -1,9 +1,11 @@
 import { db } from "../db/index.js";
 import { products } from "../db/schema.js";
 import { eq } from "drizzle-orm";
+import { embeddings } from "./embedding.js";
 
 export const productService = {
   async createProduct(name: string, description: string, image: string, price: string) {
+    const embedding = await this.productEmbeddings({ name, description, price });
     const result = await db
       .insert(products)
       .values({
@@ -11,6 +13,7 @@ export const productService = {
         description,
         image,
         price,
+        embedding,
       })
       .returning();
     return result[0];
@@ -29,6 +32,7 @@ export const productService = {
   },
 
   async updateProduct(id: string, name: string, description: string, image: string, price: string) {
+    const embedding = await this.productEmbeddings({ name, description, price });
     const result = await db
       .update(products)
       .set({
@@ -36,6 +40,7 @@ export const productService = {
         description,
         image,
         price,
+        embedding,
         updatedAt: new Date(),
       })
       .where(eq(products.id, id))
@@ -48,7 +53,7 @@ export const productService = {
     return { message: "Product deleted successfully" };
   },
 
-   searchProducts: async (query: string) => {
+  searchProducts: async (query: string) => {
     const normalized = query.trim().toLowerCase();
 
     const rows = await db.select().from(products);
@@ -58,5 +63,15 @@ export const productService = {
         product.description.toLowerCase().includes(normalized)
       )
       .slice(0, 5);
+  },
+
+  async productEmbeddings({ name, description, price }: { name: string; description: string; price: string }) {
+    const embeddingText = `
+    Product Name: ${name}
+    Description: ${description}
+    Price: ${price}
+  `;
+    const embedding = await embeddings.embedQuery(embeddingText);
+    return embedding;
   },
 };

@@ -7,7 +7,6 @@ export async function ragNode(
 ): Promise<Pick<GraphState, "context">> {
 
   const hasDocuments = await documentService.hasChunks();
-console.log("Checking for documents. Has documents:", hasDocuments);
   if (!hasDocuments) {
     return { context: "No relevant context found in uploaded documents.", documentName: undefined };
   }

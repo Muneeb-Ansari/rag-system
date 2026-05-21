@@ -22,9 +22,6 @@ async function productNode(
   console.log("Searching products for question:", state.question);
 
   const products = await productService.searchProducts(state.question);
-  const relevant = products
-    .sort((a, b) => a.distanceExpr - b.distanceExpr)
-    .slice(0, 5);
 
   if (!products.length) {
     return {
@@ -47,16 +44,13 @@ Description: ${p.description}
 const model = new ChatOpenAI({ model: "gpt-4o-mini", temperature: 0 });
 
 const initNode = async (state: any) => {
-
-  console.log("First Received question:", state.question);
+  console.log("Received question:", state.question);
   const docName = await documentService.getDocumentName();
   const name = docName?.split(" ").splice(0, 2).join(" ");
   return { documentName: name ?? undefined };
 };
 
 const routerNode = async (state: any) => {
-
-  console.log("Routing question:", state.question);
   const response = await model.invoke([
     {
       role: "system",
@@ -103,8 +97,6 @@ To assist users like a real shop assistant and make their decision easier with h
 };
 
 const chatNode = async (state: any) => {
-
-  console.log("Chat node received question:", state.question);
   const name = state.documentName ?? "your uploaded document";
 
   const response = await model.invoke([
