@@ -18,6 +18,16 @@ export interface ChatResponse {
   sources?: string[];
 }
 
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  price: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export async function uploadFile(
   file: File,
   onProgress?: (progress: number) => void
@@ -75,4 +85,41 @@ export async function sendChatMessage(message: string): Promise<ChatResponse> {
     throw new Error(error.error || 'Chat request failed');
   }
   return response.json();
+}
+
+// Product API functions
+export async function fetchProducts(): Promise<Product[]> {
+  const response = await fetch(`${API_BASE_URL}/api/products`);
+  if (!response.ok) throw new Error('Failed to fetch products');
+  return response.json();
+}
+
+export async function createProduct(name: string, description: string, image: string, price: string): Promise<Product> {
+  const response = await fetch(`${API_BASE_URL}/api/products`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, description, image, price }),
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Failed to create product' }));
+    throw new Error(error.error || 'Failed to create product');
+  }
+  return response.json();
+}
+
+export async function updateProduct(id: string, name: string, description: string, image: string, price: string): Promise<Product> {
+  const response = await fetch(`${API_BASE_URL}/api/products/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, description, image, price }),
+  });
+  if (!response.ok) throw new Error('Failed to update product');
+  return response.json();
+}
+
+export async function deleteProduct(id: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/products/${id}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) throw new Error('Failed to delete product');
 }

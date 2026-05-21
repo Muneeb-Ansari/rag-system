@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { X } from 'lucide-react';
+import { UploadCloud, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ChatHistory, type ChatSession } from '@/components/chat-history';
 import { cn } from '@/lib/utils';
@@ -50,13 +50,24 @@ export function Sidebar({
 
         <div className="flex-1 overflow-y-auto">
           <div className="border-b p-4">
-            <h2 className="mb-3 text-sm font-semibold text-sidebar-foreground">
-              Upload Document
-            </h2>
             <Button asChild variant="secondary" className="w-full">
-              <Link href="/upload">Go to upload page</Link>
+              <Link href="/upload">
+                <UploadCloud className="h-4 w-4" />
+                upload Document
+              </Link>
+            </Button>
+
+            <Button asChild variant="secondary" className="w-full mt-2">
+              <Link href="/products">
+                {/* <UploadCloud className="h-4 w-4" /> */}
+                Products
+              </Link>
             </Button>
           </div>
+
+          {/* <div className="border-b p-4">
+            
+          </div> */}
 
           <div className="flex-1">
             <h2 className="px-4 py-3 text-sm font-semibold text-sidebar-foreground">
