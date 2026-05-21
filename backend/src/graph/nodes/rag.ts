@@ -7,10 +7,12 @@ export async function ragNode(
 ): Promise<Pick<GraphState, "context">> {
 
   const hasDocuments = await documentService.hasChunks();
-
+console.log("Checking for documents. Has documents:", hasDocuments);
   if (!hasDocuments) {
-    return { context: "No relevant context found in uploaded documents." };
+    return { context: "No relevant context found in uploaded documents.", documentName: undefined };
   }
+
+  const docName = await documentService.getDocumentName();
 
   const matches = await vectorService.searchSimilar(state.question);
   const relevant = matches
@@ -22,5 +24,5 @@ export async function ragNode(
       ? relevant.map((row) => row.content).join("\n\n---\n\n")
       : "No relevant context found in uploaded documents.";
 
-  return { context };
+  return { context, documentName: docName };
 }

@@ -73,5 +73,10 @@ export const documentService = {
   async deleteDocument(documentId: string) {
     await db.delete(documentChunks).where(eq(documentChunks.documentId, documentId));
     await db.delete(documents).where(eq(documents.id, documentId));
-  }
+  },
+
+  async getDocumentName(): Promise<string | undefined> {
+    const [doc] = await db.select({ name: documents.name }).from(documents).limit(1);
+    return doc?.name;
+  },
 };

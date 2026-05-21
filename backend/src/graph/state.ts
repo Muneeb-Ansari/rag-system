@@ -4,4 +4,6 @@ export interface GraphState {
   question: string;
   context?: string;
   answer?: string;
+  chat?: string;
+  documentName?: string;
 }
