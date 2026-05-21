@@ -17,7 +17,6 @@ function generateTitle(message: string) {
 
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const activeSessionIdRef = useRef<string | null>(null);
@@ -28,17 +27,6 @@ export default function Home() {
 
   const activeSession = chatSessions.find((s) => s.id === activeSessionId);
   const messages = activeSession?.messages || [];
-
-  const handleUploadSuccess = useCallback((filename: string) => {
-    setUploadedFiles((prev) => {
-      if (prev.includes(filename)) return prev;
-      return [...prev, filename];
-    });
-  }, []);
-
-  const handleRemoveFile = useCallback((filename: string) => {
-    setUploadedFiles((prev) => prev.filter((f) => f !== filename));
-  }, []);
 
   const handleNewMessage = (message: ChatMessage) => {
     setChatSessions((prev) => {
@@ -93,9 +81,6 @@ export default function Home() {
         <Sidebar
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
-          uploadedFiles={uploadedFiles}
-          onUploadSuccess={handleUploadSuccess}
-          onRemoveFile={handleRemoveFile}
           chatSessions={chatSessions}
           activeSessionId={activeSessionId}
           onSelectSession={handleSelectSession}

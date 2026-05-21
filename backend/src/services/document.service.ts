@@ -60,5 +60,18 @@ export const documentService = {
     }
 
     return chunks;
+  },
+
+  async getDocuments() {
+    const docs = await db.select().from(documents);
+    return docs.map((doc) => ({
+      id: doc.id,
+      name: doc.name,
+    }))
+  },
+
+  async deleteDocument(documentId: string) {
+    await db.delete(documentChunks).where(eq(documentChunks.documentId, documentId));
+    await db.delete(documents).where(eq(documents.id, documentId));
   }
 };

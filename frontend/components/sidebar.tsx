@@ -1,17 +1,14 @@
 'use client';
 
-import { X, File, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { FileUpload } from '@/components/file-upload';
 import { ChatHistory, type ChatSession } from '@/components/chat-history';
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  uploadedFiles: string[];
-  onUploadSuccess: (filename: string) => void;
-  onRemoveFile: (filename: string) => void;
   chatSessions: ChatSession[];
   activeSessionId: string | null;
   onSelectSession: (id: string) => void;
@@ -22,9 +19,6 @@ interface SidebarProps {
 export function Sidebar({
   isOpen,
   onClose,
-  uploadedFiles,
-  onUploadSuccess,
-  onRemoveFile,
   chatSessions,
   activeSessionId,
   onSelectSession,
@@ -59,35 +53,9 @@ export function Sidebar({
             <h2 className="mb-3 text-sm font-semibold text-sidebar-foreground">
               Upload Document
             </h2>
-            <FileUpload onUploadSuccess={onUploadSuccess} />
-            
-            {uploadedFiles.length > 0 && (
-              <div className="mt-4 space-y-2">
-                <p className="text-xs font-medium text-muted-foreground">
-                  Uploaded Files ({uploadedFiles.length})
-                </p>
-                {uploadedFiles.map((file) => (
-                  <div
-                    key={file}
-                    className="flex items-center gap-2 rounded-lg bg-sidebar-accent p-2"
-                  >
-                    <File className="h-4 w-4 text-sidebar-primary" />
-                    <span className="flex-1 truncate text-xs text-sidebar-foreground">
-                      {file}
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={() => onRemoveFile(file)}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                      <span className="sr-only">Remove file</span>
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
+            <Button asChild variant="secondary" className="w-full">
+              <Link href="/upload">Go to upload page</Link>
+            </Button>
           </div>
 
           <div className="flex-1">
