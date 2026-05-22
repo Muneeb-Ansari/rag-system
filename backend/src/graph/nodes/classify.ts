@@ -16,6 +16,14 @@ function formatDocLabel(name?: string): string {
   return name.replace(/\.pdf$/i, "").trim();
 }
 
+/** Shop/business facts live in the PDF, not the product catalog. */
+const DOCUMENT_ROUTE_PATTERN =
+  /\b(owner|proprietor|founder|manager|location|address|where\s+(is|are)|shop\s+(location|address|info|details)|store\s+(location|address)|contact|phone|email|hours|open(ing)?\s+hours|about\s+(the\s+)?(shop|store|business)|situated|located|directions|map)\b/i;
+
+export function shouldRouteToDocument(question: string): boolean {
+  return DOCUMENT_ROUTE_PATTERN.test(question);
+}
+
 export async function classifyNode(
   state: GraphState,
 ): Promise<Pick<GraphState, "route">> {
@@ -35,6 +43,10 @@ export async function classifyNode(
     return { route: "product" };
   }
 
+  if (hasDocuments && shouldRouteToDocument(state.question)) {
+    return { route: "document" };
+  }
+
   const { route } = await classifier.invoke([
     {
       role: "system",
@@ -45,10 +57,11 @@ Available knowledge:
 - Product catalog: stored products with name, price, description
 
 Pick exactly one route:
-- "document": Question is about the uploaded PDF — its content, policies, summaries, clauses, facts inside the file, or "${docLabel}" itself.
+- "document": Question is about the uploaded PDF — its content, policies, summaries, clauses, facts inside the file, or "${docLabel}" itself. Also use "document" for shop/business facts that are NOT product listings: owner name, proprietor, store address, location, contact info, opening hours, about the shop, directions.
 - "product": Question is about shop inventory — product names, prices, comparisons, recommendations, stock-style questions, or what to buy.
-- "general": Greetings, identity ("who are you"), small talk, or questions that do not need document or product lookup.
+- "general": Greetings, identity of this chat assistant ("who are you"), small talk, or questions that do not need document or product lookup.
 
+Important: "who is the shop owner" or "where is the shop" are "document", NOT "product" or "general".
 When both sources exist, choose the source that best answers the question. Do not guess.`,
     },
     { role: "user", content: state.question },

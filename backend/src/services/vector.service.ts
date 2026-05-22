@@ -3,7 +3,7 @@ import { db } from "../db/index.js";
 import { documentChunks, products } from "../db/schema.js";
 import { embeddings } from "./embedding.js";
 
-const SIMILARITY_LIMIT = 4;
+const SIMILARITY_LIMIT = 8;
 
 export const vectorService = {
   async createEmbedding(text: string): Promise<number[]> {

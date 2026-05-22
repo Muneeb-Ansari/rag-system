@@ -28,11 +28,13 @@ export const documentService = {
     }
 
     for (const content of chunks) {
-      const embedding = await vectorService.createEmbedding(content);
+      const chunkForStorage = content.trim();
+      const textForEmbedding = `[Source: ${fileName}]\n${chunkForStorage}`;
+      const embedding = await vectorService.createEmbedding(textForEmbedding);
 
       await db.insert(documentChunks).values({
         documentId: document.id,
-        content,
+        content: chunkForStorage,
         embedding,
       });
     }

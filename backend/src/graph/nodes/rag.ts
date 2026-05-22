@@ -1,6 +1,12 @@
 import { documentService } from "../../services/document.service.js";
 import { vectorService } from "../../services/vector.service.js";
 import type { GraphState } from "../state.js";
+import { shouldRouteToDocument } from "./classify.js";
+
+function buildDocumentSearchQuery(question: string): string {
+  if (!shouldRouteToDocument(question)) return question;
+  return `${question}\nshop store owner proprietor location address contact details`;
+}
 
 export async function ragNode(
   state: GraphState,
@@ -11,10 +17,12 @@ export async function ragNode(
     return { context: "No relevant context found in uploaded documents." };
   }
 
-  const matches = await vectorService.searchSimilar(state.question);
-  const relevant = matches
-    .sort((a, b) => Number(a.distanceExpr) - Number(b.distanceExpr))
-    .slice(0, 5);
+  const matches = await vectorService.searchSimilar(
+    buildDocumentSearchQuery(state.question),
+  );
+  const relevant = matches.sort(
+    (a, b) => Number(a.distanceExpr) - Number(b.distanceExpr),
+  );
 
   const context =
     relevant.length > 0

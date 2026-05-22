@@ -59,17 +59,17 @@ export const productService = {
     return { message: "Product deleted successfully" };
   },
 
-  searchProducts: async (query: string) => {
-    const normalized = query.trim().toLowerCase();
+  // searchProducts: async (query: string) => {
+  //   const normalized = query.trim().toLowerCase();
 
-    const rows = await db.select().from(products);
-    return rows
-      .filter((product) =>
-        product.name.toLowerCase().includes(normalized) ||
-        product.description.toLowerCase().includes(normalized)
-      )
-      .slice(0, 5);
-  },
+  //   const rows = await db.select().from(products);
+  //   return rows
+  //     .filter((product) =>
+  //       product.name.toLowerCase().includes(normalized) ||
+  //       product.description.toLowerCase().includes(normalized)
+  //     )
+  //     .slice(0, 5);
+  // },
 
   async productEmbeddings({ name, description, price }: { name: string; description: string; price: string }) {
     const embeddingText = `
