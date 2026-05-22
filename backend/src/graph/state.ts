@@ -18,6 +18,14 @@ export interface GraphState {
   history?: ChatHistoryMessage[];
   standaloneQuestion?: string;
   isProductCountQuery?: boolean;
+  isPopularProductQuery?: boolean;
+  popularProductOffset?: number;
+  suppressProductCards?: boolean;
+  isAssistantIdentityQuery?: boolean;
+  isBroadDocumentQuery?: boolean;
+  isSingleProductQuery?: boolean;
+  useDocumentForProduct?: boolean;
+  isCategoryAnalysisQuery?: boolean;
   context?: string;
   answer?: string;
   documentName?: string;

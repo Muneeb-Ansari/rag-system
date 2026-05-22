@@ -19,9 +19,12 @@ export const chatService = {
     if (result.context !== undefined) response.context = result.context;
     if (
       result.matchedProducts?.length &&
-      !result.isProductCountQuery
+      !result.isProductCountQuery &&
+      !result.suppressProductCards
     ) {
-      response.products = result.matchedProducts;
+      response.products = result.isSingleProductQuery
+        ? result.matchedProducts.slice(0, 1)
+        : result.matchedProducts;
     }
     return response;
   },

@@ -4,13 +4,17 @@ import { documentChunks, products } from "../db/schema.js";
 import { embeddings } from "./embedding.js";
 
 const SIMILARITY_LIMIT = 8;
+const DOCUMENT_SIMILARITY_LIMIT = 12;
 
 export const vectorService = {
   async createEmbedding(text: string): Promise<number[]> {
     return embeddings.embedQuery(text);
   },
 
-  async searchSimilar(query: string, limit = SIMILARITY_LIMIT) {
+  async searchSimilar(
+    query: string,
+    limit: number = DOCUMENT_SIMILARITY_LIMIT,
+  ) {
     const queryEmbedding = await this.createEmbedding(query);
     const distanceExpr = cosineDistance(documentChunks.embedding, queryEmbedding);
 
