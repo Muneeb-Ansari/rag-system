@@ -1,5 +1,5 @@
 import { ragGraph } from "../graph/graph.js";
-import type { MatchedProduct } from "../graph/state.js";
+import type { ChatHistoryMessage, MatchedProduct } from "../graph/state.js";
 
 export interface ChatResponse {
   answer?: string;
@@ -8,15 +8,21 @@ export interface ChatResponse {
 }
 
 export const chatService = {
-  async ask(question: string): Promise<ChatResponse> {
-    const result = await ragGraph.invoke({ question });
+  async ask(
+    question: string,
+    history: ChatHistoryMessage[] = [],
+  ): Promise<ChatResponse> {
+    const result = await ragGraph.invoke({ question, history });
 
-    return {
-      ...(result.answer !== undefined && { answer: result.answer }),
-      ...(result.context !== undefined && { context: result.context }),
-      ...(result.matchedProducts?.length
-        ? { products: result.matchedProducts }
-        : {}),
-    };
+    const response: ChatResponse = {};
+    if (result.answer !== undefined) response.answer = result.answer;
+    if (result.context !== undefined) response.context = result.context;
+    if (
+      result.matchedProducts?.length &&
+      !result.isProductCountQuery
+    ) {
+      response.products = result.matchedProducts;
+    }
+    return response;
   },
 };

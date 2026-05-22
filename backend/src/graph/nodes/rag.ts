@@ -17,8 +17,9 @@ export async function ragNode(
     return { context: "No relevant context found in uploaded documents." };
   }
 
+  const question = state.standaloneQuestion ?? state.question;
   const matches = await vectorService.searchSimilar(
-    buildDocumentSearchQuery(state.question),
+    buildDocumentSearchQuery(question),
   );
   const relevant = matches.sort(
     (a, b) => Number(a.distanceExpr) - Number(b.distanceExpr),

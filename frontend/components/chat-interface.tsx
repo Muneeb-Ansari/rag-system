@@ -18,7 +18,13 @@ export function ChatInterface({ messages, onNewMessage }: ChatInterfaceProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const chatMutation = useMutation({
-    mutationFn: sendChatMessage,
+    mutationFn: ({
+      message,
+      history,
+    }: {
+      message: string;
+      history: { role: 'user' | 'assistant'; content: string }[];
+    }) => sendChatMessage(message, history),
     onSuccess: (data) => {
       onNewMessage({
         role: 'assistant',
@@ -47,8 +53,13 @@ export function ChatInterface({ messages, onNewMessage }: ChatInterfaceProps) {
       timestamp: new Date(),
     };
     
+    const history = messages.map((m) => ({
+      role: m.role,
+      content: m.content,
+    }));
+
     onNewMessage(userMessage);
-    chatMutation.mutate(input.trim());
+    chatMutation.mutate({ message: input.trim(), history });
     setInput('');
   };
 

@@ -1,13 +1,26 @@
-import { count } from "drizzle-orm";
+import { asc, count, eq } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { products } from "../db/schema.js";
-import { eq } from "drizzle-orm";
 import { embeddings } from "./embedding.js";
 
 export const productService = {
   async hasProducts(): Promise<boolean> {
     const [row] = await db.select({ total: count() }).from(products);
     return (row?.total ?? 0) > 0;
+  },
+
+  async getProductCount(): Promise<number> {
+    const [row] = await db.select({ total: count() }).from(products);
+    return Number(row?.total ?? 0);
+  },
+
+  async getCheapestProduct() {
+    const [product] = await db
+      .select()
+      .from(products)
+      .orderBy(asc(products.price))
+      .limit(1);
+    return product;
   },
 
   async createProduct(name: string, description: string, image: string, price: string) {

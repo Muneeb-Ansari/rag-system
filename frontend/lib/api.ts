@@ -81,13 +81,21 @@ export async function uploadFile(
   });
 }
 
-export async function sendChatMessage(message: string): Promise<ChatResponse> {
+export type ChatHistoryPayload = {
+  role: 'user' | 'assistant';
+  content: string;
+};
+
+export async function sendChatMessage(
+  message: string,
+  history: ChatHistoryPayload[] = [],
+): Promise<ChatResponse> {
   const response = await fetch(`${API_BASE_URL}/api/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ question : message }),
+    body: JSON.stringify({ question: message, history }),
   });
 
   if (!response.ok) {

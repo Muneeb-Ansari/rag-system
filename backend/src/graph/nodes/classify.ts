@@ -18,7 +18,11 @@ function formatDocLabel(name?: string): string {
 
 /** Shop/business facts live in the PDF, not the product catalog. */
 const DOCUMENT_ROUTE_PATTERN =
-  /\b(owner|proprietor|founder|manager|location|address|where\s+(is|are)|shop\s+(location|address|info|details)|store\s+(location|address)|contact|phone|email|hours|open(ing)?\s+hours|about\s+(the\s+)?(shop|store|business)|situated|located|directions|map)\b/i;
+  /\b(owner|proprietor|founder|manager|location|address|where\s+(is|are)|shop\s+(location|address|info|details|summary)|store\s+(location|address)|contact|phone|email|hours|open(ing)?\s+hours|about\s+(the\s+)?(shop|store|business)|situated|located|directions|map|book(ing)?|how\s+to\s+(book|order)|order\s+process|reserve|purchase\s+process|delivery|return\s+policy|payment)\b/i;
+
+function effectiveQuestion(state: GraphState): string {
+  return state.standaloneQuestion ?? state.question;
+}
 
 export function shouldRouteToDocument(question: string): boolean {
   return DOCUMENT_ROUTE_PATTERN.test(question);
@@ -43,9 +47,23 @@ export async function classifyNode(
     return { route: "product" };
   }
 
-  if (hasDocuments && shouldRouteToDocument(state.question)) {
+  const question = effectiveQuestion(state);
+
+  if (state.isProductCountQuery) {
+    return { route: "product" };
+  }
+
+  if (hasDocuments && shouldRouteToDocument(question)) {
     return { route: "document" };
   }
+
+  const historyBlock =
+    state.history && state.history.length > 0
+      ? `\n\nRecent conversation:\n${state.history
+          .slice(-6)
+          .map((m) => `${m.role}: ${m.content}`)
+          .join("\n")}`
+      : "";
 
   const { route } = await classifier.invoke([
     {
@@ -64,7 +82,7 @@ Pick exactly one route:
 Important: "who is the shop owner" or "where is the shop" are "document", NOT "product" or "general".
 When both sources exist, choose the source that best answers the question. Do not guess.`,
     },
-    { role: "user", content: state.question },
+    { role: "user", content: `${question}${historyBlock}` },
   ]);
 
   const resolved = resolveRoute(route, hasDocuments, hasProducts);
