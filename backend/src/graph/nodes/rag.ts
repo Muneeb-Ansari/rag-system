@@ -8,14 +8,12 @@ export async function ragNode(
 
   const hasDocuments = await documentService.hasChunks();
   if (!hasDocuments) {
-    return { context: "No relevant context found in uploaded documents.", documentName: undefined };
+    return { context: "No relevant context found in uploaded documents." };
   }
-
-  const docName = await documentService.getDocumentName();
 
   const matches = await vectorService.searchSimilar(state.question);
   const relevant = matches
-    .sort((a, b) => a.distanceExpr - b.distanceExpr)
+    .sort((a, b) => Number(a.distanceExpr) - Number(b.distanceExpr))
     .slice(0, 5);
 
   const context =
@@ -23,5 +21,5 @@ export async function ragNode(
       ? relevant.map((row) => row.content).join("\n\n---\n\n")
       : "No relevant context found in uploaded documents.";
 
-  return { context, documentName: docName };
+  return { context };
 }

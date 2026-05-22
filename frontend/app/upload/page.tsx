@@ -22,10 +22,15 @@ export default function UploadPage() {
   async function fetchDocuments() {
     try {
       const response = await fetch(`${API_BASE_URL}/api/get-documents`);
+      if (!response.ok) {
+        setDocuments([]);
+        return;
+      }
       const data = await response.json();
-      setDocuments(data);
+      setDocuments(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching documents:", error);
+      setDocuments([]);
     } finally {
       setLoading(false);
     }

@@ -1,9 +1,15 @@
+import { count } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { products } from "../db/schema.js";
 import { eq } from "drizzle-orm";
 import { embeddings } from "./embedding.js";
 
 export const productService = {
+  async hasProducts(): Promise<boolean> {
+    const [row] = await db.select({ total: count() }).from(products);
+    return (row?.total ?? 0) > 0;
+  },
+
   async createProduct(name: string, description: string, image: string, price: string) {
     const embedding = await this.productEmbeddings({ name, description, price });
     const result = await db
