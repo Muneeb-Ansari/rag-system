@@ -32,5 +32,5 @@ app.use(
 );
 
 app.listen(PORT, () => {
-  console.log(`RAG server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
