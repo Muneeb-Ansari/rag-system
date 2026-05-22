@@ -20,11 +20,10 @@ export function ChatInterface({ messages, onNewMessage }: ChatInterfaceProps) {
   const chatMutation = useMutation({
     mutationFn: sendChatMessage,
     onSuccess: (data) => {
-       console.log("TYPE:", typeof data);
-  console.log("DATA:", data);
       onNewMessage({
         role: 'assistant',
-        content: data.answer,
+        content: data.answer ?? 'Sorry, I could not generate a response.',
+        products: data.products,
         timestamp: new Date(),
       });
     },
@@ -59,8 +58,6 @@ export function ChatInterface({ messages, onNewMessage }: ChatInterfaceProps) {
       handleSubmit(e);
     }
   };
-  console.log("Rendering ChatInterface with messages:", messages);
-
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 overflow-y-auto p-4">
@@ -102,6 +99,32 @@ export function ChatInterface({ messages, onNewMessage }: ChatInterfaceProps) {
                   <p className="whitespace-pre-wrap text-sm leading-relaxed">
                     {message.content}
                   </p>
+                  {message.role === 'assistant' && message.products && message.products.length > 0 && (
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                      {message.products.map((product) => (
+                        <div
+                          key={product.id}
+                          className="overflow-hidden rounded-lg border border-border/70 bg-background"
+                        >
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="h-32 w-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="128" viewBox="0 0 200 128"%3E%3Crect fill="%23e5e7eb" width="200" height="128"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%239ca3af" font-size="12"%3ENo image%3C/text%3E%3C/svg%3E';
+                            }}
+                          />
+                          <div className="p-3">
+                            <p className="font-medium text-sm text-foreground">{product.name}</p>
+                            <p className="mt-1 text-sm text-primary">${Number(product.price).toFixed(2)}</p>
+                            <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                              {product.description}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   <p className={cn(
                     'mt-1 text-xs',
                     message.role === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'

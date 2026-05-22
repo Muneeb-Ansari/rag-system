@@ -32,12 +32,12 @@ export const vectorService = {
     const distanceExpr = cosineDistance(products.embedding, queryEmbedding);
     const results = await db
       .select({
+        id: products.id,
         name: products.name,
         description: products.description,
         image: products.image,
         price: products.price,
         distanceExpr: distanceExpr,
-
       })
       .from(products)
       .orderBy(distanceExpr)

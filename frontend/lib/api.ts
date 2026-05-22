@@ -7,15 +7,25 @@ export interface UploadResponse {
   error?: string;
 }
 
+export interface ChatProduct {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  price: string;
+}
+
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  products?: ChatProduct[];
   timestamp: Date;
 }
 
 export interface ChatResponse {
-  response: string;
-  sources?: string[];
+  answer?: string;
+  context?: string;
+  products?: ChatProduct[];
 }
 
 export interface Product {

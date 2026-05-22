@@ -4,7 +4,7 @@ import { answerNode } from "./nodes/answer.js";
 import { classifyNode, selectGraphNode } from "./nodes/classify.js";
 import { documentService } from "../services/document.service.js";
 import { productService } from "../services/product.service.js";
-import type { GraphState } from "./state.js";
+import type { GraphState, MatchedProduct } from "./state.js";
 import { ChatOpenAI } from "@langchain/openai";
 import { vectorService } from "../services/vector.service.js";
 
@@ -16,29 +16,40 @@ const GraphStatePage = Annotation.Root({
   route: Annotation<GraphState["route"]>(),
   hasDocuments: Annotation<boolean | undefined>(),
   hasProducts: Annotation<boolean | undefined>(),
+  matchedProducts: Annotation<MatchedProduct[] | undefined>(),
 });
 
 async function productNode(
   state: GraphState,
-): Promise<Pick<GraphState, "context">> {
+): Promise<Pick<GraphState, "context" | "matchedProducts">> {
   const products = await vectorService.searchProducts(state.question);
 
   if (!products.length) {
     return {
       context: "No matching products found in the catalog.",
+      matchedProducts: [],
     };
   }
 
-  const context = products
+  const matchedProducts: MatchedProduct[] = products.map((p) => ({
+    id: p.id,
+    name: p.name,
+    description: p.description,
+    image: p.image,
+    price: String(p.price),
+  }));
+
+  const context = matchedProducts
     .map(
       (p) =>
         `Name: ${p.name}
 Price: ${p.price}
+Image: ${p.image}
 Description: ${p.description}`,
     )
     .join("\n\n---\n\n");
 
-  return { context };
+  return { context, matchedProducts };
 }
 
 const model = new ChatOpenAI({ model: "gpt-4o-mini", temperature: 0 });
